@@ -23,7 +23,7 @@ func main() {
 		cfIP := c.GetHeader("Cf-Connecting-Ip")
 		ip, err := netip.ParseAddr(cfIP)
 		if err != nil {
-			slog.Error("failed to parse IP", "error", err)
+			logger.Error("failed to parse IP", "error", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "failed to parse IP",
 			})
@@ -34,16 +34,27 @@ func main() {
 		var record any
 		err = db.Lookup(ip).Decode(&record)
 		if err != nil {
-			slog.Error("failed to decode record", "error", err)
+			logger.Error("failed to decode record", "error", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "failed to decode record",
 			})
 			return
 		}
+		var cityRecord any = nil
+		cityDb, err := maxminddb.Open("city.mmdb")
+		if err != nil {
+			logger.Error("failed to open city database", "error", err)
+		} else {
+			err = cityDb.Lookup(ip).Decode(&cityRecord)
+			if err != nil {
+				logger.Error("failed to decode city record", "error", err)
+			}
+		}
 		// Return JSON response
 		c.JSON(http.StatusOK, gin.H{
 			"ip":     ip,
 			"record": record,
+			"city":   cityRecord,
 		})
 	})
 

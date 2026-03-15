@@ -6,6 +6,16 @@ Super simple api that returns some info about IP address.
 
 ```bash
 {
+  "city": {
+    "city":"Gdansk",
+    "country_code":"PL",
+    "latitude":11.11,
+    "longitude":11.11,
+    "postcode":"XX-XXX",
+    "state1":"Pomerania",
+    "state2":"",
+    "timezone":"Europe/Warsaw"
+  },
   "ip": "A.B.C.D",
   "record": {
     "anonymous_ip": {
@@ -49,4 +59,5 @@ Super simple api that returns some info about IP address.
 
 1. Download database from ip66.dev
 2. Mount databae as /ip66.mmdb inside docker container
-3. App listens on port 8080
+3. Optional: download city database, e.g. GeoLite2-City and mount in /city.mmdb
+4. App listens on port 8080
