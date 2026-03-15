@@ -18,8 +18,23 @@ func main() {
 	r.Use(sloggin.New(logger))
 	r.Use(gin.Recovery())
 
+	// Get API key from environment variable
+	API_KEY := os.Getenv("API_KEY")
+	if API_KEY == "" {
+		logger.Warn("API_KEY is not set")
+	} else {
+		logger.Info("API_KEY is set", "API_KEY", API_KEY)
+	}
+
 	// Define a simple GET endpoint
 	r.GET("/", func(c *gin.Context) {
+		if API_KEY != "" && c.GetHeader("X-Api-Key") != API_KEY {
+			logger.Error("Unauthorized", "API_KEY", API_KEY, "X-Api-Key", c.GetHeader("X-Api-Key"))
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized",
+			})
+			return
+		}
 		cfIP := c.GetHeader("Cf-Connecting-Ip")
 		ip, err := netip.ParseAddr(cfIP)
 		if err != nil {
@@ -40,7 +55,7 @@ func main() {
 			})
 			return
 		}
-		var cityRecord any = nil
+		var cityRecord any
 		cityDb, err := maxminddb.Open("city.mmdb")
 		if err != nil {
 			logger.Error("failed to open city database", "error", err)
@@ -60,5 +75,8 @@ func main() {
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
-	r.Run()
+	if err := r.Run(); err != nil {
+		logger.Error("server failed", "error", err)
+		os.Exit(1)
+	}
 }

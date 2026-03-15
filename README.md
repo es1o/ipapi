@@ -1,10 +1,10 @@
 # ipapi
 
-Super simple api that returns some info about IP address.
+Super simple API that returns some info about an IP address.
 
-## sample response
+## Sample response
 
-```bash
+```json
 {
   "city": {
     "city":"Gdansk",
@@ -54,10 +54,13 @@ Super simple api that returns some info about IP address.
 }
 ```
 
+## Configuration
+
+`API_KEY` — environment variable with the authorization key. Pass the key in the `X-API-KEY` header.
 
 ## How to run
 
 1. Download database from ip66.dev
-2. Mount databae as /ip66.mmdb inside docker container
-3. Optional: download city database, e.g. GeoLite2-City and mount in /city.mmdb
-4. App listens on port 8080
+2. Mount database as `/ip66.mmdb` inside Docker container
+3. Optional: download city database (e.g. GeoLite2-City) and mount as `/city.mmdb`
+4. App listens on port 8080.
