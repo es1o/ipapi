@@ -29,13 +29,14 @@ func main() {
 	// Define a simple GET endpoint
 	r.GET("/", func(c *gin.Context) {
 		if API_KEY != "" && c.GetHeader("X-Api-Key") != API_KEY {
-			logger.Error("Unauthorized", "API_KEY", API_KEY, "X-Api-Key", c.GetHeader("X-Api-Key"))
+			logger.Info("Unauthorized", "API_KEY", API_KEY, "X-Api-Key", c.GetHeader("X-Api-Key"))
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
 			})
 			return
 		}
 		cfIP := c.GetHeader("Cf-Connecting-Ip")
+		sloggin.AddCustomAttributes(c, slog.String("real_ip", cfIP))
 		ip, err := netip.ParseAddr(cfIP)
 		if err != nil {
 			logger.Error("failed to parse IP", "error", err)
